@@ -25,7 +25,7 @@ class CommentRetainer(ET.XMLTreeBuilder):
 
 # Defaults
 # --------
-search_dir = '/var/local/data/newspapers/batches'
+search_dir = '/opt/openoni/data/batches'
 
 
 
@@ -84,7 +84,6 @@ def find_bad_date_paths(lccn_path):
 
     if len(bad_date_paths) == 0:
         print "  Could not find batches with bad date {}".format(bad_date)
-        sys.exit(1)
 
     return bad_date_paths
 
@@ -103,7 +102,6 @@ def find_lccn_paths():
 
     if len(lccn_paths) == 0:
         print "  Could not find batches identified by LCCN {}".format(lccn)
-        sys.exit(1)
 
     return lccn_paths
 
@@ -113,7 +111,7 @@ def fix_dates(bad_date_path):
         if f.find('.xml') >= 0:
             file_path = os.path.join(bad_date_path, f)
 
-            if not args.quiet:
+            if not args.quiet and not f[-6:] == "_1.xml":
                 print "    Fix date in file {}".format(f)
 
             alto_file = 0
@@ -181,7 +179,7 @@ def fix_dates(bad_date_path):
                 new_file_fd = bad_date_re.sub(new_date_fd, f)
                 new_file_path = os.path.join(bad_date_path, new_file_fd)
 
-                if not args.quiet:
+                if not args.quiet and not f[-6:] == "_1.xml":
                     print "      Replace {} in file name with {}".format(bad_date_fd, new_date_fd)
 
                 if not args.dry_run:
@@ -192,7 +190,7 @@ def fix_dates(bad_date_path):
     new_date_path = bad_date_re.sub(new_date_fd, bad_date_path)
 
     if not args.quiet:
-        print "\n    Replace {} in dir name with {}\n".format(bad_date_fd, new_date_fd)
+        print "    Replace {} in dir name with {}".format(bad_date_fd, new_date_fd)
 
     if not args.dry_run:
         os.rename(bad_date_path, new_date_path)
@@ -224,7 +222,8 @@ def fix_dates(bad_date_path):
             for issue in root.iter():
                 if issue.text.find(bad_date_path_tail) >= 0:
                     issue_date = issue.get("issueDate")
-                    print "      - Update issue {} replacing {} with {}\n".format(issue_date, bad_date, new_date)
+                    if not args.quiet and not batch_file[-6:] == "_1.xml":
+                        print "      Update issue {} replacing {} with {}".format(issue_date, bad_date, new_date)
 
                     issue.set("issueDate",
                               issue_date.replace(bad_date, new_date))
@@ -241,11 +240,11 @@ if  __name__ =='__main__':
 
     for d in lccn_paths:
         if not args.quiet:
-            print "\nSearch for bad dates in {}".format(d)
+            print "\nSearch for bad dates in {}".format(d[len(search_dir):])
         bad_date_paths = find_bad_date_paths(d)
 
         for bdp in bad_date_paths:
             if not args.quiet:
-                print "  Search for bad dates in {}".format(bdp)
+                print "\n  Search for bad dates in {}".format(bdp[(len(search_dir) + len(d[len(search_dir):])):])
             fix_dates(bdp)
 
