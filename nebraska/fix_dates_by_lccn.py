@@ -64,7 +64,7 @@ new_date_fd = new_date.replace('-', '')
 # Handle optional redefined batch directory
 if args.search_dir:
     if os.path.exists(args.search_dir): search_dir = args.search_dir
-    else: print "{} does not exist".format(args.search_dir)
+    else: print "{0} does not exist".format(args.search_dir)
 
 
 
@@ -76,14 +76,14 @@ def find_bad_date_paths(lccn_path):
     for root, dirs, files in os.walk(lccn_path):
         for d in dirs:
             if args.verbose:
-                print "  Test if dir {} ~ bad date {}".format(d, bad_date_fd)
+                print "  Test if dir {0} ~ bad date {1}".format(d, bad_date_fd)
             if d.find(bad_date_fd) >= 0:
                 if args.verbose:
-                    print "    Dir {} ~ {}".format(d, bad_date_fd)
+                    print "    Dir {0} ~ {1}".format(d, bad_date_fd)
                 bad_date_paths.append(os.path.join(root, d))
 
     if len(bad_date_paths) == 0:
-        print "  Could not find batches with bad date {}".format(bad_date)
+        print "  Could not find batches with bad date {0}".format(bad_date)
 
     return bad_date_paths
 
@@ -94,14 +94,14 @@ def find_lccn_paths():
     for root, dirs, files in os.walk(search_dir):
         for d in dirs:
             if args.verbose:
-                print "  Test if dir {} ~ LCCN {}".format(d, lccn)
+                print "  Test if dir {0} ~ LCCN {1}".format(d, lccn)
             if d.find(lccn) >= 0:
                 if args.verbose:
-                    print "    Dir {} ~ LCCN".format(d)
+                    print "    Dir {0} ~ LCCN".format(d)
                 lccn_paths.append(os.path.join(root, d))
 
     if len(lccn_paths) == 0:
-        print "  Could not find batches identified by LCCN {}".format(lccn)
+        print "  Could not find batches identified by LCCN {0}".format(lccn)
 
     return lccn_paths
 
@@ -112,7 +112,7 @@ def fix_dates(bad_date_path):
             file_path = os.path.join(bad_date_path, f)
 
             if not args.quiet and not f[-6:] == "_1.xml":
-                print "    Fix date in file {}".format(f)
+                print "    Fix date in file {0}".format(f)
 
             alto_file = 0
             alto_file_re = re.compile("[0-9]{4}\.xml")
@@ -180,7 +180,7 @@ def fix_dates(bad_date_path):
                 new_file_path = os.path.join(bad_date_path, new_file_fd)
 
                 if not args.quiet and not f[-6:] == "_1.xml":
-                    print "      Replace {} in file name with {}".format(bad_date_fd, new_date_fd)
+                    print "      Replace {0} in file name with {1}".format(bad_date_fd, new_date_fd)
 
                 if not args.dry_run:
                     os.rename(file_path, new_file_path)
@@ -190,7 +190,7 @@ def fix_dates(bad_date_path):
     new_date_path = bad_date_re.sub(new_date_fd, bad_date_path)
 
     if not args.quiet:
-        print "    Replace {} in dir name with {}".format(bad_date_fd, new_date_fd)
+        print "    Replace {0} in dir name with {1}".format(bad_date_fd, new_date_fd)
 
     if not args.dry_run:
         os.rename(bad_date_path, new_date_path)
@@ -198,7 +198,7 @@ def fix_dates(bad_date_path):
     # Update issue record in batch(_1).xml files
     # ------------------------------------------
     if not args.quiet:
-        print "    Update dates in batch XML covering {}".format(lccn)
+        print "    Update dates in batch XML covering {0}".format(lccn)
 
     if not args.dry_run:
         # Determine batch file and bad date paths
@@ -206,7 +206,7 @@ def fix_dates(bad_date_path):
         batch_path = batch_path_re.match(bad_date_path).group(1)
         batch_files = [os.path.join(batch_path, "batch.xml"), os.path.join(batch_path, "batch_1.xml")]
 
-        bad_date_path_tail_re = re.compile(".+\/({}\/.+)$".format(lccn))
+        bad_date_path_tail_re = re.compile(".+\/({0}\/.+)$".format(lccn))
         bad_date_path_tail = bad_date_path_tail_re.match(bad_date_path).group(1)
 
         for batch_file in batch_files:
@@ -223,7 +223,7 @@ def fix_dates(bad_date_path):
                 if issue.text.find(bad_date_path_tail) >= 0:
                     issue_date = issue.get("issueDate")
                     if not args.quiet and not batch_file[-6:] == "_1.xml":
-                        print "      Update issue {} replacing {} with {}".format(issue_date, bad_date, new_date)
+                        print "      Update issue {0} replacing {1} with {2}".format(issue_date, bad_date, new_date)
 
                     issue.set("issueDate",
                               issue_date.replace(bad_date, new_date))
@@ -235,16 +235,16 @@ def fix_dates(bad_date_path):
 # Main
 # ----
 if  __name__ =='__main__':
-    print "Searching {}".format(search_dir)
+    print "Searching {0}".format(search_dir)
     lccn_paths = find_lccn_paths()
 
     for d in lccn_paths:
         if not args.quiet:
-            print "\nSearch for bad dates in {}".format(d[len(search_dir):])
+            print "\nSearch for bad dates in {0}".format(d[len(search_dir):])
         bad_date_paths = find_bad_date_paths(d)
 
         for bdp in bad_date_paths:
             if not args.quiet:
-                print "\n  Search for bad dates in {}".format(bdp[(len(search_dir) + len(d[len(search_dir):])):])
+                print "\n  Search for bad dates in {0}".format(bdp[(len(search_dir) + len(d[len(search_dir):])):])
             fix_dates(bdp)
 
