@@ -237,7 +237,6 @@ def fix_lccns(effected_issue_path):
     for batch_file in batch_files:
         # Set namespaces before parsing
         ET.register_namespace("", "http://www.loc.gov/ndnp")
-        #ET.register_namespace("ndnp", "http://www.loc.gov/ndnp")
         ET.register_namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")
 
         tree = ET.parse(batch_file, parser=CommentRetainer())
