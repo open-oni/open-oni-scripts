@@ -1,5 +1,4 @@
 #!/bin/bash
-
 function checkBldFile {
 	if [ -d "ENV/build" ]; then
 		True
@@ -10,16 +9,16 @@ function checkBldFile {
 
 function checkPort () {
 if lsof -Pi :$1 -sTCP:LISTEN -t >/dev/null ; then
-    echo "Port $1 is running. Please free this port."
+    echo "Port $1 is running"
     HALTLOAD=True
 else
-    echo "Port $1 is not running. Ready to roll."
+    echo "Port $1 is not running"
 fi
 }
 
 BASEDIR="$HOME/development/open-oni/"
 BATCHSRCDIR=$BASEDIR"batches"
-BATCHDESDIR="$BASEDIR/oo$1/docker/data/"
+BATCHDESDIR="$BASEDIR/pr$1/docker/data/"
 BATCHDIR="$BATCHDESDIR/batches"
 HALTLOAD=False
 
@@ -31,10 +30,10 @@ if $HALTLOAD ; then
 fi
 
 cd $BASEDIR
-git clone https://github.com/open-oni/open-oni.git oo$1
-cd oo$1
-git fetch origin
-git checkout -b $2 origin/$2
+git clone https://github.com/open-oni/open-oni.git pr$1
+cd pr$1
+git fetch origin pull/$1/head:pr$1
+git checkout pr$1
 git merge master
 
 rsync -avzh $BATCHSRCDIR $BATCHDESDIR. &
