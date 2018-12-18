@@ -176,11 +176,11 @@ def fix_lccns(effected_issue_path):
 
     # Copy/delete reel files
     # ----------------------
-    reel_path_re = re.compile('^(.+\/sn[0-9]+\/[0-9]{11})\/')
+    reel_path_re = re.compile('^(.+\/(?:sn)?[0-9]+\/[0-9]{11})\/')
     effected_reel_path = reel_path_re.match(effected_issue_path).group(1)
     new_reel_path = reel_path_re.match(new_issue_path).group(1)
 
-    reel_path_tail_re = re.compile('^.+\/(sn[0-9]+\/[0-9]{11})$')
+    reel_path_tail_re = re.compile('^(.+\/(?:sn)?[0-9]+\/[0-9]{11})$')
     effected_reel_path_tail = reel_path_tail_re.match(effected_reel_path).group(1)
     new_reel_path_tail = reel_path_tail_re.match(new_reel_path).group(1)
     reels_copied = []
@@ -227,7 +227,7 @@ def fix_lccns(effected_issue_path):
         print "    Update lccn in batch XML files to {0}".format(correct_lccn)
 
     # Determine batch file and bad date paths
-    batch_path_re = re.compile('^(.+)\/sn[0-9]+\/')
+    batch_path_re = re.compile('^(.+)\/(?:sn)?[0-9]+\/')
     batch_path = batch_path_re.match(effected_issue_path).group(1)
     batch_files = [os.path.join(batch_path, "batch.xml"), os.path.join(batch_path, "batch_1.xml")]
 
